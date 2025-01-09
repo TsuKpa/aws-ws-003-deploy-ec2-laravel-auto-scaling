@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  db: # For local testing
+    image: mysql:8
+    container_name: db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=laravel
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/db.sql:/docker-entrypoint-initdb.d/db.sql
+
+  app:
+    build: .
+    container_name: app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8080:80"
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=123456
+    depends_on:
+      - db
+volumes:
+  db:
+    driver: local

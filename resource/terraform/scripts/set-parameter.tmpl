@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Retrieve the database URL from SSM Parameter Store
+database_url=$(aws ssm get-parameter --name "${parameter_name}" --query "Parameter.Value" --output text)
+
+# Construct the command to be executed on the EC2 instance
+command="export DATABASE_URL='$database_url'; echo $DATABASE_URL"
+
+# Use AWS SSM Run Command to execute the command on the EC2 instance
+aws ssm send-command \
+  --instance-ids "${instance_id}" \
+  --document-name "AWS-RunShellScript" \
+  --parameters commands=["$command"]
